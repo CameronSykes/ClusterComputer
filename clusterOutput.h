@@ -12,6 +12,6 @@
 char* execName;
 
 void usage();
-void errorMessage(const char* errStr, int execType);
+void errorMessage(const char* errStr);
 
 #endif //CLUSTERCOMPUTER_CLUSTEROUTPUT_H

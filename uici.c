@@ -32,6 +32,8 @@ int u_open(u_port_t port)
         errorMessage("Failed to create listening endpoint");
     }
     
+    fprintf(stderr, "[%ld]: Port %i is listening\n", (long)getpid(), port);
+    
     return sock;
 }
 
@@ -49,19 +51,18 @@ int u_accept(int fd, char* hostName, int hostNameSize)
     }
     
     addrToName(netclient.sin_addr, hostName, hostNameSize);
-    fprintf(stderr, "[%ld]: connected to %s\n", (long)getpid(), hostName);
+    fprintf(stderr, "[%ld]: Accepted connection request from %s\n", (long)getpid(), hostName);
     
     return acceptVal;
 }
 
-int u_connect(u_port_t port, char* hostName)
+int u_connect(u_port_t port)
 {
     int connectVal;
     struct sockaddr_in server;
     int sock;
-    fd_set sockset;
+    fd_set sockSet;
     
-    nameToAddr(hostName, &(server.sin_addr.s_addr));
     server.sin_port = htons((short) port);
     server.sin_family = AF_INET;
     
@@ -74,12 +75,12 @@ int u_connect(u_port_t port, char* hostName)
     connectVal = connect(sock, (struct sockaddr*) &server, sizeof(server));
     if(connectVal == -1 || errno == EINTR || errno == EALREADY)
     {
-        FD_ZERO(&sockset);
-        FD_SET(sock, &sockset);
-        while((connectVal = select(sock + 1, NULL, &sockset, NULL, NULL)) == -1)
+        FD_ZERO(&sockSet);
+        FD_SET(sock, &sockSet);
+        while((connectVal = select(sock + 1, NULL, &sockSet, NULL, NULL)) == -1)
         {
-            FD_ZERO(&sockset);
-            FD_SET(sock, &sockset);
+            FD_ZERO(&sockSet);
+            FD_SET(sock, &sockSet);
         }
     }
     
@@ -88,6 +89,8 @@ int u_connect(u_port_t port, char* hostName)
         r_close(sock);
         errorMessage("Failed to connect");
     }
+    
+    fprintf(stderr, "[%ld]: Connected\n", (long)getpid());
     
     return sock;
 }

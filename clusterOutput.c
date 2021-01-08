@@ -24,7 +24,7 @@ void usage(int execType)
     exit(EXIT_FAILURE);
 }
 
-void errorMessage(const char* errStr, int execType)
+void errorMessage(const char* errStr)
 {
     char* errMsg = malloc(strlen("Error in ") + strlen(execName) + strlen(errStr) + 1);
     strcpy(errMsg, "Error in ");
@@ -32,5 +32,4 @@ void errorMessage(const char* errStr, int execType)
     strcat(errMsg, errStr);
     
     perror(errMsg);
-    usage(execType);
 }
