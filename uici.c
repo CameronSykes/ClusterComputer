@@ -19,7 +19,7 @@ int u_open(u_port_t port)
     
     if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&true, sizeof(true)) == -1)
     {
-        while(close(sock) == -1 && (errno == EINTR));
+        r_close(sock);
         errorMessage("Failed to create listening endpoint");
     }
     
@@ -41,7 +41,7 @@ int u_accept(int fd, char* hostName, int hostNameSize)
     struct sockaddr_in netclient;
     int acceptVal;
     
-    while((acceptVal = accept(fd, (struct sockaddr*)(&netclient), &len)) == -1);
+    while((acceptVal = accept(fd, (struct sockaddr*)(&netclient), &len)) == -1 && (errno == EINTR));
     
     if(hostName == NULL || hostNameSize <= 0)
     {
@@ -83,9 +83,15 @@ int u_connect(u_port_t port, char* hostName)
     
     if(connectVal == -1)
     {
-        while(close(sock) == -1);
+        r_close(sock);
         errorMessage("Failed to connect");
     }
     
     return sock;
+}
+
+void r_close(int fd)
+{
+    int closeVal;
+    while(closeVal = close(fd), closeVal == -1 && errno == EINTR);
 }

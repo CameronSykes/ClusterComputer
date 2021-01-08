@@ -19,5 +19,6 @@ typedef unsigned short u_port_t;
 int u_open(u_port_t port);
 int u_accept(int fd, char* hostn, int hostNameSize);
 int u_connect(u_port_t port, char* hostNameSize);
+void r_close(int fd);
 
 #endif //CLUSTERCOMPUTER_UICI_H
