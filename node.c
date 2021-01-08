@@ -10,43 +10,44 @@
 #include <netinet/in.h>
 
 #include "clusterOutput.h"
+#include "uici.h"
 
 int main(int argc, char *argv[])
 {
-     int sockfd, newsockfd, portno;
-     socklen_t clilen;
-     char buffer[256];
-     struct sockaddr_in serv_addr, cli_addr;
-     int n;
-     if (argc < 2) {
-         fprintf(stderr,"ERROR, no port provided\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) 
-        errorMessage("ERROR opening socket");
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-              sizeof(serv_addr)) < 0) 
-              errorMessage("ERROR on binding");
-     listen(sockfd,5);
-     clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd, 
-                 (struct sockaddr *) &cli_addr, 
-                 &clilen);
-     if (newsockfd < 0) 
-          errorMessage("ERROR on accept");
-     bzero(buffer,256);
-     n = read(newsockfd,buffer,255);
-     if (n < 0) errorMessage("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
-     n = write(newsockfd,"I got your message",18);
-     if (n < 0) errorMessage("ERROR writing to socket");
-     close(newsockfd);
-     close(sockfd);
-     return 0; 
+    int child;
+    char buffer[256];
+    u_port_t portNumber;
+    int communication_fd;
+    int listen_fd;
+    
+    if (argc < 2)
+    {
+        fprintf(stderr,"ERROR, no port provided\n");
+        exit(1);
+    }
+    
+    portNumber = (u_port_t) atoi(argv[1]);
+    listen_fd = u_open(portNumber);
+    
+    while(1)
+    {
+        communication_fd = u_accept(listen_fd, buffer, 256);
+        
+        child = fork();
+        if(child == -1)
+        {
+            errorMessage("Failed to fork a child");
+        }
+        else if(child == 0)
+        {
+            r_close(listen_fd)
+        }
+        else
+        {
+            r_close(communication_fd)
+        }
+    }
+    
+    while(waitpid(-1, NULL, WNOHANG) > 0);
+    return 0;
 }

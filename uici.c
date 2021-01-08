@@ -49,6 +49,8 @@ int u_accept(int fd, char* hostName, int hostNameSize)
     }
     
     addrToName(netclient.sin_addr, hostName, hostNameSize);
+    fprintf(stderr, "[%ld]: connected to %s\n", (long)getpid(), hostName);
+    
     return acceptVal;
 }
 
