@@ -37,23 +37,26 @@ int u_open(u_port_t port)
     return sock;
 }
 
+// Purpose: Carry out the accept() system call, restarting if interrupted by a non-error signal and providing user feedback
+// Returns: A file descriptor created by accept() is returned which refers to the new socket connected to fd
+// Params:  int fd              --- File descriptor of the listening socket
+//          char* hostName      --- A string passed by reference to hold the resolved name of the host at the socket used to create int fd
+//          int hostNameSize    --- The size of the address of the peer socket
 int u_accept(int fd, char* hostName, int hostNameSize)
 {
     int len = sizeof(struct sockaddr);
-    struct sockaddr_in netclient;
-    int acceptVal;
+    struct sockaddr_in netClient;
+    int acceptedSock;
     
-    while((acceptVal = accept(fd, (struct sockaddr*)(&netclient), &len)) == -1 && (errno == EINTR));
+    // Loop continually until the socket is accepted and not interrupted by a signal
+    while((acceptedSock = accept(fd, (struct sockaddr*)(&netClient), &len)) == -1 && (errno == EINTR));
     
-    if(hostName == NULL || hostNameSize <= 0)
-    {
-        errorMessage("Failed to accept connections");
-    }
+    // Resolve the name of the host. The host's name will be placed in hostName, as it's a pointer
+    addrToName(netClient.sin_addr, hostName, hostNameSize);
     
-    addrToName(netclient.sin_addr, hostName, hostNameSize);
+    // User feedback
     fprintf(stderr, "[%ld]: Accepted connection request from %s\n", (long)getpid(), hostName);
-    
-    return acceptVal;
+    return acceptedSock;
 }
 
 // Purpose: Creates an endpoint file descriptor then connects the socket referred to by that file descriptor to the address referred to by the u_port_t port variable
