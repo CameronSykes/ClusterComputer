@@ -101,33 +101,44 @@ void r_close(int fd)
     while(closeVal = close(fd), closeVal == -1 && errno == EINTR);
 }
 
-void r_read(int fd, void* buff, size_t size)
+// Purpose: Read a message at the socket, restarting if interrupted by a non-error signal
+// Returns: char*       --- The message at that socket
+// Params:  int fd      --- File descriptor, presumed to be connected and able to communicate
+//          size_t size --- The number of bytes that read() will attempt to read
+char* r_read(int fd, size_t size)
 {
     ssize_t retval;
     int totalBytes = 0;
+    char* buff = malloc(size);
     
     while(1)
     {
         retval = read(fd, buff, size);
         if(retval > 0)
         {
+            // Characters have been read from the socket
             totalBytes += retval;
         }
         else
         {
             if(retval == -1)
             {
+                // An error occurred while reading
                 if(errno != EINTR)
                 {
+                    // The error was not caused by a non-error interruption
                     errorMessage("Could not read from that file descriptor");
                 }
             }
             else if(retval == 0)
             {
+                // End-of-line
                 break;
             }
         }
     }
     
+    // Output the total number of bytes read. Partially for sanity check
     fprintf(stderr, "Bytes read: %i\n", totalBytes);
+    return buff;
 }
