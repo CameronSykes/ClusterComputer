@@ -131,3 +131,25 @@ void r_read(int fd, void* buff, size_t size)
     
     fprintf(stderr, "Bytes read: %i\n", totalBytes);
 }
+
+void r_write(int fd, char* buff)
+{
+    int bytesWritten;
+    int totalBytes = 0;
+    int messageLen = strlen(buff);
+    
+    while(totalBytes < messageLen)
+    {
+        if((bytesWritten = write(fd, buff, messageLen)) == -1 && errno != EINTR)
+        {
+            errorMessage("Error occurred while writing");
+        }
+        
+        if(bytesWritten != -1)
+        {
+            totalBytes += bytesWritten;
+        }
+    }
+    
+    fprintf(stderr, "Total bytes written: %i\n", totalBytes);
+}
