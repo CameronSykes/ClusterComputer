@@ -56,6 +56,9 @@ int u_accept(int fd, char* hostName, int hostNameSize)
     return acceptVal;
 }
 
+// Purpose: Creates an endpoint file descriptor then connects the socket referred to by that file descriptor to the address referred to by the u_port_t port variable
+// Returns: int             --- The file descriptor that refers to the socket created by socket.
+// Params:  u_port_t port   --- The port to send messages to.
 int u_connect(u_port_t port)
 {
     int connectVal;
@@ -63,22 +66,29 @@ int u_connect(u_port_t port)
     int sock;
     fd_set sockSet;
     
+    // u_port_t port is wrapped up into a sockaddr_in struct for connect()
     server.sin_port = htons((short) port);
     server.sin_family = AF_INET;
     
+    // Create a socket
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1)
     {
         errorMessage("Failed to connect");
     }
     
+    // Connect to the socket via the port provided (see above, server.sin_port)
     connectVal = connect(sock, (struct sockaddr*) &server, sizeof(server));
     if(connectVal == -1 || errno == EINTR || errno == EALREADY)
     {
-        FD_ZERO(&sockSet);
-        FD_SET(sock, &sockSet);
-        while((connectVal = select(sock + 1, NULL, &sockSet, NULL, NULL)) == -1)
+        // An error of some sort occurred
+        FD_ZERO(&sockSet); // Init sockSet to 0/empty
+        FD_SET(sock, &sockSet); // Add the created socket to the fd_set sockSet
+        
+        // Search for space to read or write in all of the sockets up to the socket numbered sock+1
+        while((connectVal = select(sock + 1, NULL, &sockSet, NULL, NULL)) == -1 && errno == EINTR)
         {
+            // No space was found. Reset sockSet and search again
             FD_ZERO(&sockSet);
             FD_SET(sock, &sockSet);
         }
@@ -86,15 +96,19 @@ int u_connect(u_port_t port)
     
     if(connectVal == -1)
     {
+        // The connection threw an error, close the socket, alert the user
         r_close(sock);
         errorMessage("Failed to connect");
     }
     
+    // User feedback
     fprintf(stderr, "[%ld]: Connected\n", (long)getpid());
-    
     return sock;
 }
 
+// Purpose: Close a socket, restarting if interrupted by a non-error signal
+// Returns: void
+// Params:  int fd  --- File descriptor to close
 void r_close(int fd)
 {
     int closeVal;
