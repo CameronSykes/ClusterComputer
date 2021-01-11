@@ -4,41 +4,57 @@
 
 #include "uici.h"
 
+#define BACKLOG 50
+
+// Purpose: Create an endpoint for communication with the address designated by u_port_t port then set up the endpoint to passively listen to the port
+// Returns: int             --- File descriptor that represents the socket opened and ready for acceptance
+// Params:  u_port_t port   --- Address of the endpoint to set up for listening
 int u_open(u_port_t port)
 {
     struct sockaddr_in server;
     int sock;
     int true = 1;
     
+    // Create a socket
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1)
     {
-        fprintf(stderr, "[%ld]: waiting for the first connection on port %d\n", (long)getpid(), (int)port);
         errorMessage("Failed to create listening endpoint");
     }
     
+    // Manipulate socket at API level and allow the port to be reused when not in use
     if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&true, sizeof(true)) == -1)
+    {
+        // ATTN: SOL_SOCKET is API level. If error SOL_SOCKET => TCP, for TCP level manipulation
+        r_close(sock);
+        errorMessage("Failed to create listening endpoint");
+    }
+    
+    // Wrap up the specifics of the port in a way that is usable for bind
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port = htons((short) port);
+    
+    if((bind(sock, (struct sockaddr*) &server, sizeof(server))) == -1)
+    {
+        r_close(sock);
+        errorMessage("Failed to bind the endpoint to the given address");
+    }
+    
+    // Open file descriptor int sock as a passive port, listening for an accept()
+    if(listen(sock, BACKLOG) == -1)
     {
         r_close(sock);
         errorMessage("Failed to create listening endpoint");
     }
     
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    server.sin_port = htons((short) port);
-    
-    if((bind(sock, (struct sockaddr*) &server, sizeof(server))) == -1 || listen(sock, 50) == -1)
-    {
-        errorMessage("Failed to create listening endpoint");
-    }
-    
+    // User feedback
     fprintf(stderr, "[%ld]: Port %i is listening\n", (long)getpid(), port);
-    
     return sock;
 }
 
 // Purpose: Carry out the accept() system call, restarting if interrupted by a non-error signal and providing user feedback
-// Returns: A file descriptor created by accept() is returned which refers to the new socket connected to fd
+// Returns: int                 --- A file descriptor created by accept() is returned which refers to the new socket connected to fd
 // Params:  int fd              --- File descriptor of the listening socket
 //          char* hostName      --- A string passed by reference to hold the resolved name of the host at the socket used to create int fd
 //          int hostNameSize    --- The size of the address of the peer socket
