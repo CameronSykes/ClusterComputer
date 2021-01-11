@@ -175,3 +175,33 @@ char* r_read(int fd, size_t size)
     fprintf(stderr, "Bytes read: %i\n", totalBytes);
     return buff;
 }
+
+// Purpose: Write a message to the socket represented by the file descriptor int fd. If the system call is interrupted by a non-error interrupt the writing process will restart
+// Returns: void
+// Params:  int fd      --- The file descriptor to write to
+//          char* buff  --- The message to write
+void r_write(int fd, char* buff)
+{
+    int bytesWritten;
+    int totalBytes = 0;
+    int messageLen = strlen(buff);
+    
+    // The bytes written should be equivalent to the length of the message
+    while(totalBytes < messageLen)
+    {
+        if((bytesWritten = write(fd, buff, messageLen)) == -1 && errno != EINTR)
+        {
+            // A real error occurred
+            errorMessage("Error occurred while writing");
+        }
+        
+        if(bytesWritten != -1)
+        {
+            // Something was written, update the control variable
+            totalBytes += bytesWritten;
+        }
+    }
+    
+    // User feedback
+    fprintf(stderr, "Total bytes written: %i\n", totalBytes);
+}
