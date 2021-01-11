@@ -100,3 +100,34 @@ void r_close(int fd)
     int closeVal;
     while(closeVal = close(fd), closeVal == -1 && errno == EINTR);
 }
+
+void r_read(int fd, void* buff, size_t size)
+{
+    ssize_t retval;
+    int totalBytes = 0;
+    
+    while(1)
+    {
+        retval = read(fd, buff, size);
+        if(retval > 0)
+        {
+            totalBytes += retval;
+        }
+        else
+        {
+            if(retval == -1)
+            {
+                if(errno != EINTR)
+                {
+                    errorMessage("Could not read from that file descriptor");
+                }
+            }
+            else if(retval == 0)
+            {
+                break;
+            }
+        }
+    }
+    
+    fprintf(stderr, "Bytes read: %i\n", totalBytes);
+}
