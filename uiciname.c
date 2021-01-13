@@ -38,12 +38,12 @@ char* addrToName(struct in_addr addr)
 }
 
 // Throws an errorMessage if the host can not be reached at that name
-in_addr_t* nameToAddr(char* name)
+in_addr_t nameToAddr(char* name)
 {
     struct hostent* hp;
     in_addr_t* addr = malloc(sizeof(in_addr_t));
 
-    if(isdigit((int) (*name)))
+    if(isdigit(*name))
     {
         *addr = inet_addr(name);
     }
@@ -58,7 +58,7 @@ in_addr_t* nameToAddr(char* name)
         memcpy((char*) addr, hp->h_addr_list[0], hp->h_length);
     }
     
-    return addr;
+    return *addr;
 }
 
 #elif REENTRANCY==REENTRANT_R

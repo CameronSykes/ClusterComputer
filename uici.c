@@ -79,7 +79,7 @@ int u_accept(int fd)
 // Purpose: Creates an endpoint file descriptor then connects the socket referred to by that file descriptor to the address referred to by the u_port_t port variable
 // Returns: int             --- The file descriptor that refers to the socket created by socket.
 // Params:  u_port_t port   --- The port to send messages to.
-int u_connect(u_port_t port)
+int u_connect(u_port_t port, char* host)
 {
     int connectVal;
     struct sockaddr_in server;
@@ -87,6 +87,7 @@ int u_connect(u_port_t port)
     fd_set sockSet;
     
     // u_port_t port is wrapped up into a sockaddr_in struct for connect()
+    server.sin_addr.s_addr = nameToAddr(host);
     server.sin_port = htons((short) port);
     server.sin_family = AF_INET;
     

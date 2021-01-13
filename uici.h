@@ -18,7 +18,7 @@
 typedef unsigned short u_port_t;
 int u_open(u_port_t port);
 int u_accept(int fd);
-int u_connect(u_port_t port);
+int u_connect(u_port_t port, char* host);
 void r_close(int fd);
 char* r_read(int fd);
 void r_write(int fd, char* buff);

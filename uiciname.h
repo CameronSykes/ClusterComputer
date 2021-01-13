@@ -20,7 +20,7 @@
 #define REENTRANT_POSIX 3
 #define NAME_LENGTH 256
 
-in_addr_t* nameToAddr(char* name);
+in_addr_t nameToAddr(char* name);
 char* addrToName(struct in_addr addr);
 
 #endif //CLUSTERCOMPUTER_UICINAME_H

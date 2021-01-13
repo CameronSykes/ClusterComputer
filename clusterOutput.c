@@ -30,4 +30,5 @@ void errorMessage(const char* errStr)
     strcat(errMsg, errStr);
     
     perror(errMsg);
+    exit(EXIT_FAILURE);
 }
