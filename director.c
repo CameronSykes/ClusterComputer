@@ -12,11 +12,11 @@ int main(int argc, char *argv[])
        usage();
     }
     
-    portNumber = atoi(argv[2]);
-    fd = u_connect(portNumber);
+    portNumber = atoi(argv[2]); // The user needs to pass the port that they wish to connect to
+    fd = u_connect(portNumber); // Connect the port and return a file descriptor representing said port
     
-    r_write(fd, "This is director, do you copy?");
-    fprintf(stderr, "[%ld]: Sent a message to node\n", (long)getpid());
+    r_write(fd, "This is director, do you copy?"); // Write to the node
+    fprintf(stderr, "[%ld]: Sent a message to node\n", (long)getpid()); // User feedback
     
     return 0;
 }
