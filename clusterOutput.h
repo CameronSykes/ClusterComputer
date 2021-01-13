@@ -9,9 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* execName;
-
-void usage();
+void usage(int execType);
 void errorMessage(const char* errStr);
 
 #endif //CLUSTERCOMPUTER_CLUSTEROUTPUT_H

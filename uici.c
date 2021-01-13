@@ -5,7 +5,6 @@
 #include "uici.h"
 
 #define BACKLOG 50
-#define HOSTNAME_SIZE 256
 
 // Purpose: Create an endpoint for communication with the address designated by u_port_t port then set up the endpoint to passively listen to the port
 // Returns: int             --- File descriptor that represents the socket opened and ready for acceptance

@@ -18,10 +18,9 @@ int node(int argc, char *argv[])
     int listen_fd;
     char* message;
     
-    if (argc < 2)
+    if (argc != 2)
     {
-        fprintf(stderr,"ERROR, no port provided\n");
-        exit(1);
+        usage(0);
     }
     
     portNumber = (u_port_t) atoi(argv[1]); // The user passes the port that they wish to connect to

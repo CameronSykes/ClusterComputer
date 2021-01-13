@@ -6,13 +6,12 @@ int main(int argc, char *argv[])
     u_port_t portNumber;
     int fd;
     
-    execName = argv[0];
-    if (argc > 3)
+    if (argc != 2)
     {
-       usage();
+       usage(1);
     }
     
-    portNumber = atoi(argv[2]); // The user needs to pass the port that they wish to connect to
+    portNumber = atoi(argv[1]); // The user needs to pass the port that they wish to connect to
     fd = u_connect(portNumber); // Connect the port and return a file descriptor representing said port
     
     r_write(fd, "This is director, do you copy?"); // Write to the node

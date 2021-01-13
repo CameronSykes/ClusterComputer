@@ -6,29 +6,27 @@
 
 void usage(int execType)
 {
-    char* usageStr = malloc(strlen("director [hostname] [port]"));
-    if(execType == 1)
+    int usageLen = execType ? strlen("director [port]") + 1 : strlen("node [port]") + 1;
+    
+    char* usageStr = malloc(usageLen);
+    if(execType)
     {
-        strcpy(usageStr, "director [hostname] [port]");
-    }
-    else if(execType == 2)
-    {
-        strcpy(usageStr, "node [port]");
+        strcpy(usageStr, "director ");
     }
     else
     {
-        perror("That executable option is invalid");
+        strcpy(usageStr, "node ");
     }
+    strcat(usageStr, "[port]");
     
-    fprintf(stderr, "========== USAGE ==========\n%s\n%s\n", execName, usageStr);
+    fprintf(stderr, "========== USAGE ==========\n%s\n", usageStr);
     exit(EXIT_FAILURE);
 }
 
 void errorMessage(const char* errStr)
 {
-    char* errMsg = malloc(strlen("Error in ") + strlen(execName) + strlen(errStr) + 1);
-    strcpy(errMsg, "Error in ");
-    strcat(errMsg, execName);
+    char* errMsg = malloc(strlen("Error: ") + strlen(errStr) + 1);
+    strcpy(errMsg, "Error: ");
     strcat(errMsg, errStr);
     
     perror(errMsg);
