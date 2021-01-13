@@ -27,7 +27,7 @@ int node(int argc, char *argv[])
     portNumber = (u_port_t) atoi(argv[1]);
     listen_fd = u_open(portNumber);
     
-    while(spawned < 20)
+    while(spawned < 1)
     {
         communication_fd = u_accept(listen_fd);
         

@@ -4,6 +4,7 @@
 int main(int argc, char *argv[])
 {
     u_port_t portNumber;
+    int fd;
     
     execName = argv[0];
     if (argc > 3)
@@ -12,10 +13,10 @@ int main(int argc, char *argv[])
     }
     
     portNumber = atoi(argv[2]);
-    u_connect(portNumber);
+    fd = u_connect(portNumber);
     
-    // read and/or write to the node
-    // fprintf(stderr, "[%ld]: Sent a message to node\n", (long)getpid());
+    r_write(fd, "This is director, do you copy?");
+    fprintf(stderr, "[%ld]: Sent a message to node\n", (long)getpid());
     
     return 0;
 }
