@@ -18,8 +18,9 @@
 #define REENTRANT_R 1
 #define REENTRANT_MUTEX 2
 #define REENTRANT_POSIX 3
+#define NAME_LENGTH 256
 
-void nameToAddr(char* name, in_addr_t* addr);
-void addrToName(struct in_addr addr, char* name, int namelen);
+in_addr_t* nameToAddr(char* name);
+char* addrToName(struct in_addr addr);
 
 #endif //CLUSTERCOMPUTER_UICINAME_H

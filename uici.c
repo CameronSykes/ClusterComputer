@@ -5,6 +5,7 @@
 #include "uici.h"
 
 #define BACKLOG 50
+#define HOSTNAME_SIZE 256
 
 // Purpose: Create an endpoint for communication with the address designated by u_port_t port then set up the endpoint to passively listen to the port
 // Returns: int             --- File descriptor that represents the socket opened and ready for acceptance
@@ -58,17 +59,18 @@ int u_open(u_port_t port)
 // Params:  int fd              --- File descriptor of the listening socket
 //          char* hostName      --- A string passed by reference to hold the resolved name of the host at the socket used to create int fd
 //          int hostNameSize    --- The size of the address of the peer socket
-int u_accept(int fd, char* hostName, int hostNameSize)
+int u_accept(int fd)
 {
     int len = sizeof(struct sockaddr);
     struct sockaddr_in netClient;
     int acceptedSock;
+    char* hostName;
     
     // Loop continually until the socket is accepted and not interrupted by a signal
     while((acceptedSock = accept(fd, (struct sockaddr*)(&netClient), &len)) == -1 && (errno == EINTR));
     
     // Resolve the name of the host. The host's name will be placed in hostName, as it's a pointer
-    addrToName(netClient.sin_addr, hostName, hostNameSize);
+    hostName = addrToName(netClient.sin_addr);
     
     // User feedback
     fprintf(stderr, "[%ld]: Accepted connection request from %s\n", (long)getpid(), hostName);
