@@ -139,16 +139,16 @@ void r_close(int fd)
 // Purpose: Read a message at the socket, restarting if interrupted by a non-error signal
 // Returns: char*       --- The message at that socket
 // Params:  int fd      --- File descriptor, presumed to be connected and able to communicate
-//          size_t size --- The number of bytes that read() will attempt to read
-char* r_read(int fd, size_t size)
+char* r_read(int fd)
 {
+    const int SIZE = 256;
     ssize_t retval;
     int totalBytes = 0;
-    char* buff = malloc(size);
+    char* buff = malloc(SIZE);
     
     while(1)
     {
-        retval = read(fd, buff, size);
+        retval = read(fd, buff, SIZE);
         if(retval > 0)
         {
             // Characters have been read from the socket
